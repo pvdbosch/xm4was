@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.management.DynamicMBean;
 import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -35,7 +34,7 @@ public class PlatformMXBeansRegistrations {
             LOGGER.entering("PlatformMXBeansRegistrations", "registerMBean", new Object[] { object, name });
         }
         try {
-            mbs.registerMBean(new AccessControlProxy((DynamicMBean)object, name.getKeyProperty("type"), accessChecker), name);
+            mbs.registerMBean(new AccessControlProxy(object, name.getKeyProperty("type"), accessChecker), name);
             registeredMBeans.add(name);
             if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.log(Level.FINEST, "Registered MBean " + name + " (type " + object.getClass().getName() + ")");

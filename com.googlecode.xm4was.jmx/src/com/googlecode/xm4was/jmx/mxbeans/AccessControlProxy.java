@@ -12,6 +12,7 @@ import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanException;
 import javax.management.MBeanInfo;
 import javax.management.ReflectionException;
+import javax.management.StandardMBean;
 
 public class AccessControlProxy implements DynamicMBean {
     private final Map<String,String> attributeNameToGetterNameMap = new HashMap<String,String>();
@@ -21,11 +22,18 @@ public class AccessControlProxy implements DynamicMBean {
     private final String type;
     private final AccessChecker accessChecker;
     
-    public AccessControlProxy(DynamicMBean target, String type, AccessChecker accessChecker) {
-        this.target = target;
+    public AccessControlProxy(Object target, String type, AccessChecker accessChecker) {
+        if (target instanceof DynamicMBean)
+        {
+            this.target = (DynamicMBean)target;
+        }
+        else
+        {
+            this.target = new StandardMBean(target, null, true);
+        }
         this.type = type;
         this.accessChecker = accessChecker;
-        for (MBeanAttributeInfo info : target.getMBeanInfo().getAttributes()) {
+        for (MBeanAttributeInfo info : this.target.getMBeanInfo().getAttributes()) {
             String name = info.getName();
             attributeNameToGetterNameMap.put(name, info.isIs() ? "is" + name : "get" + name);
             attributeNameToSetterNameMap.put(name, "set" + name);
